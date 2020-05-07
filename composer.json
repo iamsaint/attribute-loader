@@ -1,0 +1,10 @@
+{
+    "name": "iamsaint/attribute-loader",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Loader\\": "loader",
+            "App\\": "app"
+        }
+    }
+}
