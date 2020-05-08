@@ -7,7 +7,7 @@ use Yiisoft\Arrays\ArrayHelper;
 
 class Loader implements LoaderInterface
 {
-    private Object $source;
+    private $source;
     private Object $target;
     private array $setters = [];
     private array $protected = [];
@@ -15,8 +15,9 @@ class Loader implements LoaderInterface
     public string $undefinedSetter = 'Undefined setter class';
     public string $undefinedSource = 'Source object is not defined';
     public string $undefinedTarget = 'Target object is not defined';
+    public string $unknownSourceType = 'Unknown source type';
 
-    public function source(Object &$source): LoaderInterface
+    public function source($source): LoaderInterface
     {
         $this->source = $source;
         return $this;
@@ -43,12 +44,12 @@ class Loader implements LoaderInterface
 
         $properties = $this->properties();
         foreach ($properties as $property) {
-            if (in_array($property->name, $this->protected, true)) {
+            if (in_array($property, $this->protected, true)) {
                 continue;
             }
 
-            $setter = $this->getSetter($property->name);
-            $setter->set($this->source, $this->target, $property->name);
+            $setter = $this->getSetter($property);
+            $setter->set($this->source, $this->target, $property);
         }
     }
 
@@ -70,10 +71,23 @@ class Loader implements LoaderInterface
         return new $class();
     }
 
-    private function properties()
+    /**
+     * @return array
+     * @throws \ReflectionException
+     * @throws \Exception
+     */
+    private function properties(): array
     {
-        $reflection = new \ReflectionClass($this->source);
-        return $reflection->getProperties();
+        if (is_array($this->source)) {
+            return array_keys($this->source);
+        }
+
+        if (is_object($this->source)) {
+            $reflection = new \ReflectionClass($this->source);
+            return ArrayHelper::getColumn($reflection->getProperties(), 'name');
+        }
+
+        throw new \Exception($this->unknownSourceType);
     }
 
     public function setters(array $setters): LoaderInterface

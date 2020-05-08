@@ -5,10 +5,10 @@ namespace Loader;
 interface LoaderInterface
 {
     /**
-     * @param Object $source
+     * @param Object|array $source
      * @return LoaderInterface
      */
-    public function source(Object &$source): LoaderInterface;
+    public function source($source): LoaderInterface;
 
     /**
      * @param Object $target

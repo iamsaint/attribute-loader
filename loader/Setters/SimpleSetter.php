@@ -7,17 +7,26 @@ use Loader\SetterInterface;
 class SimpleSetter implements SetterInterface
 {
     /**
-     * @param Object $source
+     * @param Object|array $source
      * @param Object $target
      * @param string $property
      */
-    public function set(Object &$source, Object &$target, string $property): void
+    public function set($source, Object &$target, string $property): void
     {
-        $getter = 'get' . ucfirst($property);
         $setter = 'set' . ucfirst($property);
 
-        if (method_exists($source, $getter) && method_exists($target, $setter)) {
-            $target->$setter($source->$getter());
+        if (method_exists($target, $setter)) {
+            if (is_array($source) && array_key_exists($property, $source)) {
+                $target->$setter($source[$property]);
+            }
+
+            if (is_object($source)) {
+                $getter = 'get' . ucfirst($property);
+
+                if (method_exists($source, $getter)) {
+                    $target->$setter($source->$getter());
+                }
+            }
         }
     }
 }

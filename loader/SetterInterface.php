@@ -2,11 +2,12 @@
 
 namespace Loader;
 
-interface SetterInterface {
+interface SetterInterface
+{
     /**
-     * @param Object $source
+     * @param Object|array $source
      * @param Object $target
      * @param string $property
      */
-    public function set(Object &$source, Object &$target, string $property): void;
+    public function set($source, Object &$target, string $property): void;
 }
